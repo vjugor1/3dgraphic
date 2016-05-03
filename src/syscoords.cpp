@@ -12,6 +12,7 @@ SysCoords::SysCoords(Vector3f axisX, Vector3f axisY, Vector3f axisZ, Vector3f po
 void SysCoords::Rotate(Vector3f rotAxis, turnType type)
 {
 	//Vector3f rotAxisXY = rotAxis.GetXYProj();
+	// Test change
 
 	//move in XY 
 	float firstMoveAng = axisX.GetAng(rotAxis);

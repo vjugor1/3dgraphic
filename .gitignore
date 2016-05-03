@@ -65,6 +65,7 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+*.exe
 
 # Chutzpah Test files
 _Chutzpah*
@@ -211,4 +212,3 @@ _Pvt_Extensions/
 ModelManifest.xml
 /glm-0.9.7.4.zip
 *.opendb
-*.exe
