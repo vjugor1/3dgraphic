@@ -19,6 +19,14 @@ void SysCoords::Rotate(Vector3f rotAxis, turnType type)
 	
 	//std::cout << "firstmoveang = " << firstMoveAng << "\n";
 	//rotAxisXY.Print();
+/*
+	Vector2f vec;
+	ang;
+
+	Vector2f xVector = vec.GetNorm();
+	Vector2f yVector = xVector.GetPerpendicular();*/
+
+
 	Vector3f newAxisX = Vector3f(axisX.x * cosf(firstMoveAng) + axisY.x * sin(firstMoveAng),
 								 axisX.y * cosf(firstMoveAng) + axisY.y * sin(firstMoveAng),
  								 axisX.z * cosf(firstMoveAng) + axisY.z * sin(firstMoveAng));

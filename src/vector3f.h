@@ -19,7 +19,7 @@ struct Vector3f
   Vector3f GetXYProj(); //attention! return (x,y,0)^T
   Vector3f GetXZProj();
   Vector3f GetYZProj();
-  Vector3f Rotate(Vector3f axis);
+  Vector3f Rotate(Vector3f axis, float ang);
   void Print();
 };
 

@@ -54,6 +54,9 @@ int main()
 	sf::Vector2f delta;
 	
 	sf::Clock clock;
+	sf::Time timeSinceLastUpdate = sf::Time::Zero;
+	sf::Time timePerFrame;
+	timePerFrame = sf::seconds(1.0f / 20.0f);
 	float pi = 3.1415926535f;
 	float ang = pi / 20.0f;
 	Vector3f newXVec(1.0f,
@@ -65,8 +68,8 @@ int main()
 	Vector3f newZVec(0.0f,
 		0.0f,
 		1.0f);
-	Vector3f point(0.0f,
-		0.0f,
+	Vector3f point(0.5f,
+		0.5f,
 		1.0f);
 	SysCoords sys(newXVec, newYVec, newZVec, point);
 
@@ -76,6 +79,7 @@ int main()
 	while (window.isOpen())
 	{
 	
+		timeSinceLastUpdate += clock.restart();
 		sf::Event evt;
 		while (window.pollEvent(evt))
 		{
@@ -91,73 +95,78 @@ int main()
 		delta = maxPoint - minPoint;
 		sf::Shader::bind(&shader);
 
+		while (timeSinceLastUpdate > timePerFrame)
+		{
+			timeSinceLastUpdate -= timePerFrame;
+			//try to rotate reference to local axises, not global
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				sys.point = sys.point + Vector3f(0.0f, 0.01f, 0.0f);//*dt
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			{
+				sys.point = sys.point - Vector3f(0.0f, 0.01f, 0.0f);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			{
+				sys.point = sys.point - Vector3f(0.01f, 0.0f, 0.0f);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			{
+				sys.point = sys.point + Vector3f(0.01f, 0.0f, 0.0f);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
+			{
+				sys.point = sys.point + Vector3f(0.0f, 0.0f, 0.01f);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
+			{
+				sys.point = sys.point - Vector3f(0.0f, 0.0f, 0.01f);
+			}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		{
-			sys.point = sys.point + Vector3f(0.0f, 0.1f, 0.0f);
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			sys.point = sys.point - Vector3f(0.0f, 0.1f, 0.0f);
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			sys.point = sys.point - Vector3f(0.1f, 0.0f, 0.0f);
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
-			sys.point = sys.point + Vector3f(0.1f, 0.0f, 0.0f);
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
-		{
-			sys.point = sys.point + Vector3f(0.0f, 0.0f, 0.1f);
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
-		{
-			sys.point = sys.point - Vector3f(0.0f, 0.0f, 0.1f);
-		}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				//sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f), positive);
+				sys.Rotate(sys.axisZ, positive);
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-		{
-			sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f), positive);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			{
 
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-		{
-		
 
-			sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f), negative);
-		}
-		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-		{
-			
+				//sys.Rotate(camera.zVector * angularVelocity * dt, negative);
+				//sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f, negative);
+				sys.Rotate(sys.axisZ, negative);
+			}
 
-			sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), positive);
-		}
-		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-		{
-			
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				//sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), positive);
+				sys.Rotate(sys.axisY, positive);
+			}
 
-			sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), negative);
-		}
-		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-		{
-			
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				//sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), negative);
+				sys.Rotate(sys.axisY, negative);
+			}
 
-			sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), positive);
-		}
-		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-		{
-			sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), negative);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
+			{
+				//sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), positive);
+				sys.Rotate(sys.axisX, positive);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+			{
+				//sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), negative);
+				sys.Rotate(sys.axisX, negative);
+			}
 		}
 
 		sf::Vector2f cursorPos=
 		 (sf::Vector2f)sf::Mouse::getPosition(window);
-			shader.setParameter("mousePos",
+			shader.setParameter("mousePosUniform",
 				sf::Vector2f(cursorPos.x, window.getSize().y - cursorPos.y));
 			sf::Vector3f goX = sf::Vector3f(sys.axisX.x, sys.axisX.y, sys.axisX.z);
 			sf::Vector3f goY = sf::Vector3f(sys.axisY.x, sys.axisY.y, sys.axisY.z);

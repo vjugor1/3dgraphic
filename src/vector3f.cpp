@@ -101,8 +101,11 @@ Vector3f Vector3f::GetNorm()
 
 float Vector3f::GetAng(Vector3f v2)
 {
-	if ((*this).GetNorm() * v2.GetNorm() >= 1.0f)
-		std::cout << "WARNING\n";
+	if ((*this).GetNorm() * v2.GetNorm() > 1.0f)
+	{
+		std::cout << "WARNING\n";	//LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL!!!!!!!!!!!!!!!!!!
+		return acosf(floorf((*this).GetNorm() * v2.GetNorm()));
+	}
 	return acosf((*this).GetNorm() * v2.GetNorm());
 }
 
@@ -126,9 +129,18 @@ Vector3f Vector3f::GetYZProj()
 					(*this).y,
 					(*this).z);
 }
+
+
+
 //давай сделаем библиотеку для системы координат
-/*Vector3f Vector3f::Rotate(Vector3f axis)
+/*Vector3f Vector3f::Rotate(Vector3f axis, float ang)
 {
+
+
+	Vector3f xVector = vec.GetNorm();
+	Vector3f yVector = xVector.GetPerpendicular(); 
+
+
 	Vector3f thisXY = (*this).GetXYProj;
 	Vector3f axisXY = axis.GetXYProj;
 	float AngXY = thisXY.GetAng(axisXY);

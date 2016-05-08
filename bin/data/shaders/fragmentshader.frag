@@ -1,6 +1,6 @@
 //GLSL
 
-uniform vec2 mousePos;
+uniform vec2 mousePosUniform;
 uniform vec3 newXVec;
 uniform vec3 newYVec;
 uniform vec3 newZVec;
@@ -23,9 +23,10 @@ float FuncBall(vec3 point)
 {
 	//return point.x;
 	//return log(abs(point.x + point.y)) ;
-	//return (0.25*cos(50.0*(point.x + point.y)) + point.z);
+	//return (0.1*cos(20.0*(point.x + point.y)) + point.z);
 	//return dot((point - vec3(0.7, 0.5, 0.0)), (point - vec3(0.7, 0.5, 0.0))) - 0.2;
 	return 1.0 / sqr(point - vec3(0.5, 0.5, 0.0)) + 1.0 / sqr(point - vec3(0.9, 0.5, 0.0)) - 1.0 / 0.025;
+	//<FUNCTION>
 }
 
 
@@ -45,7 +46,10 @@ struct LightPoint
 	vec3 color;
 	bool resExist;
 };
-LightPoint GetCrossPoint(vec3 rayDir, vec3 rayOrigin, float param, float paramStep)
+
+//можно сделать тени например
+
+LightPoint GetCrossPoint(vec3 rayDir, vec3 rayOrigin, float param, float paramStep, vec3 coordPoint)
 {
 	LightPoint pt;
 	vec3 geomPosition;
@@ -74,7 +78,7 @@ LightPoint GetCrossPoint(vec3 rayDir, vec3 rayOrigin, float param, float paramSt
 		else
 		{
 			res.exist = false;
-			gl_FragColor.rgba = vec4(1.0, 0.0, 0.0, 1.0);
+			gl_FragColor.rgba = vec4(0.7, 0.7, 0.3, 1.0);
 		}
 
 		
@@ -96,7 +100,7 @@ LightPoint GetCrossPoint(vec3 rayDir, vec3 rayOrigin, float param, float paramSt
 		param = param + paramStep;
 
 	}
-	
+	//pt.geomPos = vec3(pt.geomPos.xy + coordPoint.xy, pt.geomPos.z);
 	return pt;
 }
 
@@ -106,7 +110,7 @@ void LightThisShit(LightPoint pt, vec2 windowSize, vec2 mousePos, vec3 normal)
 	if (pt.resExist)
 	{
 		vec3 lightPos1 = vec3(mousePos / windowSize, 1.0);
-		
+		lightPos1 = normalize(newXVec) * lightPos1.x + normalize(newYVec) * lightPos1.y + normalize(newZVec) * lightPos1.z;// +vec3(0.5, 0.5, 0.0);
 
 		vec3 lightDir1 = normalize(pt.geomPos - lightPos1);
 		
@@ -133,15 +137,17 @@ void LightThisShit(LightPoint pt, vec2 windowSize, vec2 mousePos, vec3 normal)
 
 void main()
 {
+	//
 	vec2 windowSize = vec2(800.0, 600.0);
 	vec2 texCoord = vec2(gl_FragCoord.xy / windowSize);
-
+	vec2 mousePos = mousePosUniform;
+	//mousePos = normalize(newXVec.xy) * mousePos.x + normalize(newYVec.xy) * mousePos.y;
 	
 	//vec3 rayOrigin = vec3(texCoord, 0.0);
 	//vec3 rayDir = vec3(0.0, 0.0, 1.0);
 
-	vec3 rayOrigin = coordPoint;
-	vec3 rayDir = vec3(texCoord, 0.0) - rayOrigin;
+	vec3 rayOrigin = coordPoint;// look all the way
+	vec3 rayDir = vec3(texCoord, -1.0);
 	rayOrigin = normalize(newXVec) * rayOrigin.x + normalize(newYVec) * rayOrigin.y + normalize(newZVec) * rayOrigin.z;
 	rayDir = normalize(newXVec) * rayDir.x + normalize(newYVec) * rayDir.y + normalize(newZVec) * rayDir.z;
 	
@@ -164,7 +170,7 @@ void main()
 
 
 
-	LightPoint pt = GetCrossPoint(rayDir, rayOrigin, param, paramStep);
+	LightPoint pt = GetCrossPoint(rayDir, rayOrigin, param, paramStep, coordPoint);
 
 	//TurnThisShit(pt);
 	
