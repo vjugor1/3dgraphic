@@ -16,4 +16,5 @@ struct SysCoords
 	SysCoords(Vector3f axisX, Vector3f axisY, Vector3f axisZ, Vector3f point);
 
 	void Rotate(Vector3f axis, turnType type);
+	void Move(Vector3f dir);
 };

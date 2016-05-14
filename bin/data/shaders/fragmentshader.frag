@@ -5,6 +5,13 @@ uniform vec3 newXVec;
 uniform vec3 newYVec;
 uniform vec3 newZVec;
 uniform vec3 coordPoint;
+//uniform vec4 testVec4;
+uniform float scrWidth;
+uniform float scrLen;
+uniform vec4 projVec1;
+uniform vec4 projVec2;
+uniform vec4 projVec3;
+uniform vec4 projVec4;
 float FuncSin(vec2 point)
 {
 	return (0.25*sin(50.0*(point.x + point.y)));
@@ -25,7 +32,10 @@ float FuncBall(vec3 point)
 	//return log(abs(point.x + point.y)) ;
 	//return (0.1*cos(20.0*(point.x + point.y)) + point.z);
 	//return dot((point - vec3(0.7, 0.5, 0.0)), (point - vec3(0.7, 0.5, 0.0))) - 0.2;
-	return 1.0 / sqr(point - vec3(0.5, 0.5, 0.0)) + 1.0 / sqr(point - vec3(0.9, 0.5, 0.0)) - 1.0 / 0.025;
+	//return 1.0 / sqr(point - vec3(0.5, 0.5, 0.0)) + 1.0 / sqr(point - vec3(0.9, 0.5, 0.0)) - 1.0 / 0.025;
+	return 0.25*sin(log(point.x*point.y)) - point.z; //!!!!!
+	//return 0.25 * sin(point.x) * cos(point.y) - point.z;
+	//return 0.00001*tan(0.25 * sin(point.x) * cos(point.y) - point.z);
 	//<FUNCTION>
 }
 
@@ -54,7 +64,7 @@ LightPoint GetCrossPoint(vec3 rayDir, vec3 rayOrigin, float param, float paramSt
 	LightPoint pt;
 	vec3 geomPosition;
 	CastRes res;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 250; i++)
 	{
 		
 
@@ -138,7 +148,7 @@ void LightThisShit(LightPoint pt, vec2 windowSize, vec2 mousePos, vec3 normal)
 void main()
 {
 	//
-	vec2 windowSize = vec2(800.0, 600.0);
+	vec2 windowSize = vec2(scrWidth, scrLen);
 	vec2 texCoord = vec2(gl_FragCoord.xy / windowSize);
 	vec2 mousePos = mousePosUniform;
 	//mousePos = normalize(newXVec.xy) * mousePos.x + normalize(newYVec.xy) * mousePos.y;
@@ -146,11 +156,15 @@ void main()
 	//vec3 rayOrigin = vec3(texCoord, 0.0);
 	//vec3 rayDir = vec3(0.0, 0.0, 1.0);
 
-	vec3 rayOrigin = coordPoint;// look all the way
+	vec3 rayOrigin = coordPoint;// - vec3(0.5, 0.5, 0.0);// look all the way
 	vec3 rayDir = vec3(texCoord, -1.0);
 	rayOrigin = normalize(newXVec) * rayOrigin.x + normalize(newYVec) * rayOrigin.y + normalize(newZVec) * rayOrigin.z;
 	rayDir = normalize(newXVec) * rayDir.x + normalize(newYVec) * rayDir.y + normalize(newZVec) * rayDir.z;
 	
+
+	//rayDir = (projVec1 * rayDir.x + projVec2 * rayDir.y + projVec3 * rayDir.z + projVec4 * 1.0).xyz;
+	//rayOrigin = (projVec1 * rayOrigin.x + projVec2 * rayOrigin.y + projVec3 * rayOrigin.z + projVec4 * 1.0).xyz;
+
 	/*rayOrigin = vec3(rayOrigin.x * newXVec.x + rayOrigin.y * newYVec.x + rayOrigin.z * newZVec.x,
 		rayOrigin.x * newXVec.y + rayOrigin.y * newYVec.y + rayOrigin.z * newZVec.y,
 		rayOrigin.x * newXVec.z + rayOrigin.y * newYVec.z + rayOrigin.z * newZVec.z);
@@ -170,12 +184,14 @@ void main()
 
 
 
-	LightPoint pt = GetCrossPoint(rayDir, rayOrigin, param, paramStep, coordPoint);
+	LightPoint pt = GetCrossPoint(rayDir - vec3(0.5, 0.5, 0.0), rayOrigin, param, paramStep, coordPoint);
 
 	//TurnThisShit(pt);
 	
-	LightThisShit(pt, windowSize, mousePos, pt.normal); //должна возвращать цвет
 
+	//pt.geomPos = (projVec1 * pt.geomPos.x + projVec2 * pt.geomPos.y + projVec3 * pt.geomPos.z + projVec4 * 1.0).xyz;
+	LightThisShit(pt, windowSize, mousePos, pt.normal); //должна возвращать цвет
+	
 	
 
 
@@ -188,5 +204,6 @@ void main()
 		gl_FragColor.rgba = vec4(0.0, 1.0, 0.0, 1.0);
 	}*/
 
-
+	//gl_FragColor.rgba = testVec4;
+	//gl_FragColor.rgb = projVec1.xyz;
 }

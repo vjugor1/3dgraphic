@@ -4,6 +4,7 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\vector3f.cpp" />
     <ClCompile Include="..\..\src\syscoords.cpp" />
+    <ClCompile Include="..\..\src\perspectiveproj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\data\shaders\fragmentshader.frag" />
@@ -11,5 +12,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\vector3f.h" />
     <ClInclude Include="..\..\src\syscoords.hpp" />
+    <ClInclude Include="..\..\src\perspectiveproj.hpp" />
   </ItemGroup>
 </Project>
