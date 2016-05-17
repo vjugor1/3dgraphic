@@ -4,7 +4,7 @@
 #include "syscoords.hpp"
 //#include "matrix_transform.hpp"
 //#include <GL\glew.h>
-#include "perspectiveproj.hpp"
+
 void RenderFullScreenQuad(sf::RenderWindow* wnd)
 {
 	sf::Vertex vertices[4];
@@ -63,10 +63,10 @@ int main()
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 	sf::Time timePerFrame;
-	timePerFrame = sf::seconds(1.0f / 140.0f);
+	timePerFrame = sf::seconds(1.0f / 10.0f);
 	float pi = 3.1415926535f;
 	//float ang = pi / 20.0f;
-	float angularVelocity = pi;
+	float angularVelocity = pi * 5.0f;
 	float dt = 1e-2f;
 	Vector3f newXVec(1.0f,
 					 0.0f,
@@ -82,13 +82,14 @@ int main()
 					1.0f);
 	SysCoords sys(newXVec, newYVec, newZVec, point);
 	/////////////////////////////////////////////////////////////////////////
-	Matrix4x4f PerspectiveProj;
-	PerspectiveProj.InitPerspectiveProj(SCREENWIDTH / SCREENLENGTH, 0.2f, 1.0f, 1.2f);
+	//Matrix4x4f PerspectiveProj;
+	//PerspectiveProj.InitPerspectiveProj(SCREENWIDTH / SCREENLENGTH, 0.2f, 1.0f, 1.2f);
 	 
-	 
+	sf::Vector2f currMousePos = (sf::Vector2f)(sf::Mouse::getPosition(window));
+	sf::Vector2f prevMousePos = (sf::Vector2f)(sf::Mouse::getPosition(window));
 	while (window.isOpen())
 	{
-	
+		currMousePos = (sf::Vector2f)(sf::Mouse::getPosition(window));
 		timeSinceLastUpdate += clock.restart();
 		sf::Event evt;
 		while (window.pollEvent(evt))
@@ -111,33 +112,33 @@ int main()
 			//try to rotate reference to local axises, not global
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			{
-				sys.point = sys.point + Vector3f(0.0f, 0.01f, 0.0f) * dt;//*dt
+				sys.point = sys.point + sys.axisY * dt * 10.0f;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 			{
-				sys.point = sys.point - Vector3f(0.0f, 0.01f, 0.0f)  * dt;
+				sys.point = sys.point - sys.axisY * dt * 10.0f;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			{
-				sys.point = sys.point - Vector3f(0.01f, 0.0f, 0.0f);
+				sys.point = sys.point - sys.axisX * dt * 10.0f;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 			{
-				sys.point = sys.point + Vector3f(0.01f, 0.0f, 0.0f);
+				sys.point = sys.point + sys.axisX * dt * 10.0f;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
 			{
-				sys.point = sys.point + Vector3f(0.0f, 0.0f, 0.01f);
+				sys.point = sys.point + sys.axisZ * dt * 10.0f;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
 			{
-				sys.point = sys.point - Vector3f(0.0f, 0.0f, 0.01f);
+				sys.point = sys.point - sys.axisZ * dt * 10.0f;
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
 				//sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f), positive);
-				sys.Rotate(sys.axisZ * angularVelocity * dt, positive);
+				sys.Rotate(sys.point, sys.axisZ * angularVelocity * dt);
 
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -146,38 +147,52 @@ int main()
 
 				//sys.Rotate(camera.zVector * angularVelocity * dt, negative);
 				//sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f, negative);
-				sys.Rotate(sys.axisZ * angularVelocity * dt, negative);
+				//sys.Rotate(sys.point, sys.axisZ/* * angularVelocity * dt*/, negative);
+				sys.Rotate(sys.point, sys.axisZ * angularVelocity * (-dt));
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
 				//sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), positive);
-				sys.Rotate(sys.axisY * angularVelocity * dt, positive);
+				sys.Rotate(sys.point, sys.axisY * angularVelocity * dt);
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
 				//sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), negative);
-				sys.Rotate(sys.axisY * angularVelocity * dt, negative);
+				sys.Rotate(sys.point, sys.axisY * angularVelocity * (-dt));
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
 			{
 				//sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), positive);
-				sys.Rotate(sys.axisX * angularVelocity * dt, positive);
+				sys.Rotate(sys.point, sys.axisX * angularVelocity * dt);
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
 			{
 				//sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), negative);
-				sys.Rotate(sys.axisX * angularVelocity * dt, negative);
+				sys.Rotate(sys.point, sys.axisX * angularVelocity * (-dt));
 			}
 		}
+		////////////////////////////////////////////////////////////
+		/*Vector2f prevMousePos;
+		Vector2f currMousePos;
+		*/
 
-		sf::Vector2f cursorPos=
-		 (sf::Vector2f)sf::Mouse::getPosition(window);
-			shader.setParameter("mousePosUniform",
-				sf::Vector2f(cursorPos.x, window.getSize().y - cursorPos.y));
+		sf::Vector2f mouseDelta = currMousePos - prevMousePos;
+		//std::cout << " mouseDelta.x = " << mouseDelta.x << "\n mouseDelta.y = " << mouseDelta.y;
+		/*if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (mouseDelta.x != 0.0f) && (mouseDelta.y != 0.0f))
+		{
+			sys.Rotate(sys.point, sys.axisX * mouseDelta.y * 0.01f, positive);
+			sys.Rotate(sys.point, Vector3f(0.0f, 1.0f, 0.0f) * mouseDelta.x * 0.001f, positive);
+		}*/
+		/////////////////////////////////////////////////
+
+		//sf::Vector2f cursorPos=V
+		 //(sf::Vector2f)sf::Mouse::getPosition(window);
+			//shader.setParameter("mousePosUniform",
+			//	sf::Vector2f(cursorPos.x, window.getSize().y - cursorPos.y));
 			sf::Vector3f goX = sf::Vector3f(sys.axisX.x, sys.axisX.y, sys.axisX.z);
 			sf::Vector3f goY = sf::Vector3f(sys.axisY.x, sys.axisY.y, sys.axisY.z);
 			sf::Vector3f goZ = sf::Vector3f(sys.axisZ.x, sys.axisZ.y, sys.axisZ.z);
@@ -192,14 +207,15 @@ int main()
 		shader.setParameter("maxPoint", sf::Vector2f(maxPoint));
 		shader.setParameter("time", clock.getElapsedTime().asSeconds());
 		shader.setParameter("testTex", tex);
-		shader.setParameter("projVec1", PerspectiveProj.column1.q1, PerspectiveProj.column1.q2, PerspectiveProj.column1.q3, PerspectiveProj.column1.q4);
-		shader.setParameter("projVec2", PerspectiveProj.column2.q1, PerspectiveProj.column2.q2, PerspectiveProj.column2.q3, PerspectiveProj.column2.q4);
-		shader.setParameter("projVec3", PerspectiveProj.column3.q1, PerspectiveProj.column3.q2, PerspectiveProj.column3.q3, PerspectiveProj.column3.q4);
-		shader.setParameter("projVec4", PerspectiveProj.column4.q1, PerspectiveProj.column4.q2, PerspectiveProj.column4.q3, PerspectiveProj.column4.q4);
+		//shader.setParameter("projVec1", PerspectiveProj.column1.q1, PerspectiveProj.column1.q2, PerspectiveProj.column1.q3, PerspectiveProj.column1.q4);
+		//shader.setParameter("projVec2", PerspectiveProj.column2.q1, PerspectiveProj.column2.q2, PerspectiveProj.column2.q3, PerspectiveProj.column2.q4);
+		//shader.setParameter("projVec3", PerspectiveProj.column3.q1, PerspectiveProj.column3.q2, PerspectiveProj.column3.q3, PerspectiveProj.column3.q4);
+		//shader.setParameter("projVec4", PerspectiveProj.column4.q1, PerspectiveProj.column4.q2, PerspectiveProj.column4.q3, PerspectiveProj.column4.q4);
 		shader.setParameter("scrWidth", SCREENWIDTH);
 		shader.setParameter("scrLen", SCREENLENGTH);
 		RenderFullScreenQuad(&window);
 		window.display();
+		prevMousePos = currMousePos;
 	}
 	return 0;
 }

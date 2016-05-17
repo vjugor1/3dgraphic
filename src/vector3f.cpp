@@ -85,16 +85,29 @@ Vector3f operator *(float d, Vector3f v)
 }
 
 
-
-
 float operator *(Vector3f v1, Vector3f v2)
 {
   return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
+Vector3f operator ^(Vector3f v1, Vector3f v2)
+{
+		return (Vector3f(v1.y * v2.z - v1.z * v2.y,
+				v1.z * v2.x - v1.x * v2.z,
+				v1.x * v2.y - v1.y * v2.x));
 
+}
 Vector3f Vector3f::GetNorm()
 {
-  return (*this) * (1.0f / (*this).Length());
+	//if(((*this).x != 0) && ((*this).y != 0) && ((*this).z != 0))
+	
+	if ((*this).x == 0.0f && (*this).y == 0.0f && (*this).z == 0.0f)
+	{
+		return Vector3f(0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		return (*this) * (1.0f / (*this).Length());
+	}
 }
 
 
@@ -129,7 +142,36 @@ Vector3f Vector3f::GetYZProj()
 					(*this).y,
 					(*this).z);
 }
-
+void Vector3f::Rotate(Vector3f axis)
+{
+	Vector3f currVec = (*this);
+	Vector3f axisNorm = axis.GetNorm();
+	std::cout << "axisNorm: \n";
+	axisNorm.Print();
+	std::cout << "\n";
+	Vector3f vecAxisProj = ((*this) * axisNorm) * axisNorm;
+	std::cout << "vecAxisProj: \n";
+	vecAxisProj.Print();
+	std::cout << "\n";
+	Vector3f vecDiff = (*this) - vecAxisProj;
+	std::cout << "DOT(AXISPROJ , VECDIFF) = " << vecDiff * vecAxisProj << std::endl;
+	float vecDiffLen = vecDiff.Length();
+	std::cout << "vecDiff: \n";
+	vecDiff.Print();
+	std::cout << "\n";
+	Vector3f vecDiffPerpendicular = (axis ^ vecDiff);
+	std::cout << "vecDiffPerpendicular: \n";
+	vecDiffPerpendicular.Print();
+	std::cout << "\n";
+	Vector3f newVecDiff = (vecDiff.GetNorm() * cosf(axis.Length()) - vecDiffPerpendicular.GetNorm() * sinf(axis.Length())).GetNorm() * vecDiffLen;
+	std::cout << "newVecDiff: \n";
+	newVecDiff.Print();
+	std::cout << "\n";
+	std::cout << "res: \n";
+	(vecAxisProj + newVecDiff).GetNorm().Print();
+	std::cout << "\n";
+	(*this) =  (vecAxisProj + newVecDiff);
+}
 
 
 //давай сделаем библиотеку для системы координат
