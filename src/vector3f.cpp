@@ -98,7 +98,7 @@ Vector3f operator ^(Vector3f v1, Vector3f v2)
 }
 Vector3f Vector3f::GetNorm()
 {
-	//if(((*this).x != 0) && ((*this).y != 0) && ((*this).z != 0))
+	
 	
 	if ((*this).x == 0.0f && (*this).y == 0.0f && (*this).z == 0.0f)
 	{
@@ -146,45 +146,30 @@ void Vector3f::Rotate(Vector3f axis)
 {
 	Vector3f currVec = (*this);
 	Vector3f axisNorm = axis.GetNorm();
-	std::cout << "axisNorm: \n";
+	/*std::cout << "axisNorm: \n";
 	axisNorm.Print();
-	std::cout << "\n";
+	std::cout << "\n";*/
 	Vector3f vecAxisProj = ((*this) * axisNorm) * axisNorm;
-	std::cout << "vecAxisProj: \n";
+	/*std::cout << "vecAxisProj: \n";
 	vecAxisProj.Print();
-	std::cout << "\n";
+	std::cout << "\n";*/
 	Vector3f vecDiff = (*this) - vecAxisProj;
-	std::cout << "DOT(AXISPROJ , VECDIFF) = " << vecDiff * vecAxisProj << std::endl;
+	/*std::cout << "DOT(AXISPROJ , VECDIFF) = " << vecDiff * vecAxisProj << std::endl;*/
 	float vecDiffLen = vecDiff.Length();
-	std::cout << "vecDiff: \n";
+	/*std::cout << "vecDiff: \n";
 	vecDiff.Print();
-	std::cout << "\n";
+	std::cout << "\n";*/
 	Vector3f vecDiffPerpendicular = (axis ^ vecDiff);
-	std::cout << "vecDiffPerpendicular: \n";
+	/*std::cout << "vecDiffPerpendicular: \n";
 	vecDiffPerpendicular.Print();
-	std::cout << "\n";
+	std::cout << "\n";*/
 	Vector3f newVecDiff = (vecDiff.GetNorm() * cosf(axis.Length()) - vecDiffPerpendicular.GetNorm() * sinf(axis.Length())).GetNorm() * vecDiffLen;
-	std::cout << "newVecDiff: \n";
+	/*std::cout << "newVecDiff: \n";
 	newVecDiff.Print();
 	std::cout << "\n";
 	std::cout << "res: \n";
-	(vecAxisProj + newVecDiff).GetNorm().Print();
-	std::cout << "\n";
+	(vecAxisProj + newVecDiff).GetNorm().Print();*/
+	
 	(*this) =  (vecAxisProj + newVecDiff);
 }
 
-
-//давай сделаем библиотеку для системы координат
-/*Vector3f Vector3f::Rotate(Vector3f axis, float ang)
-{
-
-
-	Vector3f xVector = vec.GetNorm();
-	Vector3f yVector = xVector.GetPerpendicular(); 
-
-
-	Vector3f thisXY = (*this).GetXYProj;
-	Vector3f axisXY = axis.GetXYProj;
-	float AngXY = thisXY.GetAng(axisXY);
-
-}*/

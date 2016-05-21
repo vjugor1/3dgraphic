@@ -1,7 +1,11 @@
 #include <vector>
 #include <iostream>
+#include <string>
+#include <algorithm>
+#include <fstream>
 #include <SFML/Graphics.hpp>
 #include "syscoords.hpp"
+
 //#include "matrix_transform.hpp"
 //#include <GL\glew.h>
 
@@ -38,7 +42,6 @@ void RenderFullScreenQuad(sf::RenderWindow* wnd)
 
 int main()
 {
-	int check = 0;
 	sf::RenderWindow window(sf::VideoMode(SCREENWIDTH, SCREENLENGTH), "Awesome window");
 
 	sf::Texture tex;
@@ -53,40 +56,44 @@ int main()
 	}
 	tex.setSmooth(true);//сглаживание
 
+	
+
 	sf::Shader shader;
 	//shader.loadFromFile("data\\shaders\\fragmentshader.frag", sf::Shader::Fragment);
 	shader.loadFromFile("C:\\Users\\HP\\Desktop\\CPP projectz\\hometask130416(openglfunc) - sfml - copy\\bin\\data\\shaders\\fragmentshader.frag", sf::Shader::Fragment);
-	sf::Vector2f minPoint (-1.0f, -1.0f);
+	sf::Shader::bind(&shader);
+
+	sf::Vector2f minPoint(-1.0f, -1.0f);
 	sf::Vector2f maxPoint(1.0f, 1.0f);
 	sf::Vector2f delta;
-	
+
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 	sf::Time timePerFrame;
-	timePerFrame = sf::seconds(1.0f / 10.0f);
+	timePerFrame = sf::seconds(1.0f / 20.0f);
 	float pi = 3.1415926535f;
 	//float ang = pi / 20.0f;
-	float angularVelocity = pi * 5.0f;
-	float dt = 1e-2f;
+	float angularVelocity = pi * 10.0f;
+	float dt = 1e-3f;
 	Vector3f newXVec(1.0f,
-					 0.0f,
-					 0.0f);
+		0.0f,
+		0.0f);
 	Vector3f newYVec(0.0f,
-					 1.0f,
-					 0.0f);
+		1.0f,
+		0.0f);
 	Vector3f newZVec(0.0f,
-					 0.0f,
-					 1.0f);
+		0.0f,
+		1.0f);
 	Vector3f point(0.5f,
-					0.5f,
-					1.0f);
+		0.5f,
+		1.0f);
 	SysCoords sys(newXVec, newYVec, newZVec, point);
-	/////////////////////////////////////////////////////////////////////////
-	//Matrix4x4f PerspectiveProj;
-	//PerspectiveProj.InitPerspectiveProj(SCREENWIDTH / SCREENLENGTH, 0.2f, 1.0f, 1.2f);
-	 
+
 	sf::Vector2f currMousePos = (sf::Vector2f)(sf::Mouse::getPosition(window));
 	sf::Vector2f prevMousePos = (sf::Vector2f)(sf::Mouse::getPosition(window));
+
+	sf::Vector3f gotColor(72.0f / 255.0f, 91.0f / 255.0f, 178.0f / 255.0f);
+	sf::Vector3f looseColor(136.0f / 255.0f, 110.0f / 255.0f, 46.0f / 255.0f);
 	while (window.isOpen())
 	{
 		currMousePos = (sf::Vector2f)(sf::Mouse::getPosition(window));
@@ -94,17 +101,16 @@ int main()
 		sf::Event evt;
 		while (window.pollEvent(evt))
 		{
+
 			if (evt.type == sf::Event::Closed)
 			{
 				window.close();
 			}
 		}
+
+
+		window.clear();	
 		
-		
-		window.clear();
-		float accuracy = 1e-2f;
-		delta = maxPoint - minPoint;
-		sf::Shader::bind(&shader);
 
 		while (timeSinceLastUpdate > timePerFrame)
 		{
@@ -137,85 +143,74 @@ int main()
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
-				//sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f), positive);
 				sys.Rotate(sys.point, sys.axisZ * angularVelocity * dt);
 
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			{
-
-
-				//sys.Rotate(camera.zVector * angularVelocity * dt, negative);
-				//sys.Rotate(Vector3f(0.0f, 0.0f, 1.0f, negative);
-				//sys.Rotate(sys.point, sys.axisZ/* * angularVelocity * dt*/, negative);
-				sys.Rotate(sys.point, sys.axisZ * angularVelocity * (-dt));
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), sys.axisZ * angularVelocity * (-dt));
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
-				//sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), positive);
-				sys.Rotate(sys.point, sys.axisY * angularVelocity * dt);
+				
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), sys.axisY * angularVelocity * dt);
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
-				//sys.Rotate(Vector3f(0.0f, 1.0f, 0.0f), negative);
-				sys.Rotate(sys.point, sys.axisY * angularVelocity * (-dt));
+				
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), sys.axisY * angularVelocity * (-dt));
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
 			{
-				//sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), positive);
-				sys.Rotate(sys.point, sys.axisX * angularVelocity * dt);
+				
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), sys.axisX * angularVelocity * dt);
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
 			{
-				//sys.Rotate(Vector3f(1.0f, 0.0f, 0.0f), negative);
-				sys.Rotate(sys.point, sys.axisX * angularVelocity * (-dt));
+				
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), sys.axisX * angularVelocity * (-dt));
+				//sys.point = sys.point - sys.axisY * angularVelocity * dt; //WIIIIIN
 			}
-		}
-		////////////////////////////////////////////////////////////
-		/*Vector2f prevMousePos;
-		Vector2f currMousePos;
-		*/
 
-		sf::Vector2f mouseDelta = currMousePos - prevMousePos;
-		//std::cout << " mouseDelta.x = " << mouseDelta.x << "\n mouseDelta.y = " << mouseDelta.y;
-		/*if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (mouseDelta.x != 0.0f) && (mouseDelta.y != 0.0f))
-		{
-			sys.Rotate(sys.point, sys.axisX * mouseDelta.y * 0.01f, positive);
-			sys.Rotate(sys.point, Vector3f(0.0f, 1.0f, 0.0f) * mouseDelta.x * 0.001f, positive);
-		}*/
-		/////////////////////////////////////////////////
-
-		//sf::Vector2f cursorPos=V
-		 //(sf::Vector2f)sf::Mouse::getPosition(window);
-			//shader.setParameter("mousePosUniform",
-			//	sf::Vector2f(cursorPos.x, window.getSize().y - cursorPos.y));
+			sf::Vector2f mouseDelta = currMousePos - prevMousePos;
+			//std::cout << "currMousepos.x = " << currMousePos.x / window.getSize().x << "\ncurrMousePos.y = " << currMousePos.y / window.getSize().y << "\n";
+			//std::cout << " mouseDelta.x = " << mouseDelta.x << "\n mouseDelta.y = " << mouseDelta.y;
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (mouseDelta.x != 0.0f) && (mouseDelta.y != 0.0f))
+			{
+				//sys.Rotate(Vector3f(currMousePos.x / window.getSize().x, (window.getSize().y - currMousePos.y) / window.getSize().y, 0.0f), sys.axisX * mouseDelta.y * 0.001f);
+				//sys.Rotate(Vector3f(currMousePos.x / window.getSize().x, (window.getSize().y - currMousePos.y) / window.getSize().y, 0.0f), Vector3f(0.0f, 1.0f, 0.0f) * mouseDelta.x * 0.001f);
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), sys.axisX * mouseDelta.y * 0.001f);
+				sys.Rotate(Vector3f(0.5, 0.5, 0.0), Vector3f(0.0f, 1.0f, 0.0f) * mouseDelta.x * 0.001f);
+			}
 			sf::Vector3f goX = sf::Vector3f(sys.axisX.x, sys.axisX.y, sys.axisX.z);
 			sf::Vector3f goY = sf::Vector3f(sys.axisY.x, sys.axisY.y, sys.axisY.z);
 			sf::Vector3f goZ = sf::Vector3f(sys.axisZ.x, sys.axisZ.y, sys.axisZ.z);
 			sf::Vector3f goPoint = sf::Vector3f(sys.point.x, sys.point.y, sys.point.z);
-		shader.setParameter("newXVec", sf::Vector3f(goX));
-		shader.setParameter("newYVec", sf::Vector3f(goY));
-		shader.setParameter("newZVec", sf::Vector3f(goZ));
-		shader.setParameter("coordPoint", sf::Vector3f(goPoint));
-		//shader.setParameter("Matrix", MVP);
-		//GLuint matrixId = glGetUniformLocation()
-		shader.setParameter("minPoint", sf::Vector2f(minPoint));
-		shader.setParameter("maxPoint", sf::Vector2f(maxPoint));
-		shader.setParameter("time", clock.getElapsedTime().asSeconds());
-		shader.setParameter("testTex", tex);
-		//shader.setParameter("projVec1", PerspectiveProj.column1.q1, PerspectiveProj.column1.q2, PerspectiveProj.column1.q3, PerspectiveProj.column1.q4);
-		//shader.setParameter("projVec2", PerspectiveProj.column2.q1, PerspectiveProj.column2.q2, PerspectiveProj.column2.q3, PerspectiveProj.column2.q4);
-		//shader.setParameter("projVec3", PerspectiveProj.column3.q1, PerspectiveProj.column3.q2, PerspectiveProj.column3.q3, PerspectiveProj.column3.q4);
-		//shader.setParameter("projVec4", PerspectiveProj.column4.q1, PerspectiveProj.column4.q2, PerspectiveProj.column4.q3, PerspectiveProj.column4.q4);
-		shader.setParameter("scrWidth", SCREENWIDTH);
-		shader.setParameter("scrLen", SCREENLENGTH);
+			shader.setParameter("newXVec", sf::Vector3f(goX));
+			shader.setParameter("newYVec", sf::Vector3f(goY));
+			shader.setParameter("newZVec", sf::Vector3f(goZ));
+			shader.setParameter("coordPoint", sf::Vector3f(goPoint));
+			shader.setParameter("gotColor", gotColor);
+			shader.setParameter("looseColor", looseColor);
+			
+			
+			
+			
+			shader.setParameter("scrWidth", SCREENWIDTH);
+			shader.setParameter("scrLen", SCREENLENGTH);
+			prevMousePos = currMousePos;
+		}
 		RenderFullScreenQuad(&window);
+
+		
+
 		window.display();
-		prevMousePos = currMousePos;
+
+
 	}
 	return 0;
 }
